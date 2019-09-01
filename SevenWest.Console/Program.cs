@@ -1,8 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-namespace SevenWest
+using SevenWest.Core.Entities;
+using SevenWest.Core.Services;
+
+namespace SevenWest.Console
 {
     class Program
     {
@@ -11,15 +13,17 @@ namespace SevenWest
             var host = new HostBuilder()
                 .Configure(args);
             
-            var dataSource = host.Services.GetService<IDataSource>();
+            var dataSource = host.Services.GetService<IDataSource<Person>>();
             var personQueryService = host.Services.GetService<IPersonQueryService>();
             var outputService = host.Services.GetService<IOutputService>();
 
+            // Return if no file paths in arguments
             if (!args.Any())
             {
                 return;
             }
             
+            // Load Data source from file
             dataSource.Initialise(args.FirstOrDefault());
 
             // The users full name for id = 42

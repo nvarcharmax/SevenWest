@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.Logging;
+using SevenWest.Core.Entities;
 
-namespace SevenWest
+namespace SevenWest.Core.Services
 {
-    public interface IPersonQueryService
-    {
-        List<string> GetFullNamesById(int id);
-        List<string> GetCommaSeparatedFirstNamesByAge(int age);
-        List<string> GetGenderDistributionByAge();
-    }
-
     public class PersonQueryService : IPersonQueryService
     {
         public ILogger<PersonQueryService> _logger;
-        public IDataSource _dataSource;
+        public IDataSource<Person> _dataSource;
 
-        public PersonQueryService(ILogger<PersonQueryService> logger, IDataSource dataSource)
+        public PersonQueryService(ILogger<PersonQueryService> logger, IDataSource<Person> dataSource)
         {
             _logger = logger;
             _dataSource = dataSource;
@@ -41,7 +33,7 @@ namespace SevenWest
         public List<string> GetGenderDistributionByAge()
         {
             var groups = _dataSource.Data.GroupBy(x => x.Age).OrderBy(x => x.Key);
-            var distinctGenders = _dataSource.Data.Select(x => x.Gender).Distinct();
+            var distinctGenders = _dataSource.Data.Select(x => x.Gender).Distinct().ToArray();
 
             var results = new List<string>();
 
