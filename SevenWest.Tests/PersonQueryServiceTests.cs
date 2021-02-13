@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Castle.Core.Logging;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using SevenWest.Core.Entities;
 using SevenWest.Core.Services;
+using SevenWest.Tests.Helpers;
 
 namespace SevenWest.Tests
 {
@@ -14,22 +17,20 @@ namespace SevenWest.Tests
     public class PersonQueryServiceTests
     {
         [TestMethod]
-        public void PersonQueryServiceTests_ExampleFileProcessed()
+        public async Task PersonQueryServiceTests_ExampleFileProcessed()
         {
             // Arrange
-            // TODO: Currently reusing the JsonDataSource service - with proper unit tests, we should ideally generate the data here
-            var dataSourcelogger = new Moq.Mock<ILogger<JsonDataSource<Person>>>();
-            var dataSource = new JsonDataSource<Person>(dataSourcelogger.Object);
+            var data = FileHelper.GetAsJson<List<Person>>(@".\TestData\example_data.json");
+            var dataSource = new Moq.Mock<IPersonDataSource>();
+            dataSource.Setup(x => x.Get()).Returns(Task.FromResult(data));
 
             var logger = new Moq.Mock<ILogger<PersonQueryService>>();
-            var sut = new PersonQueryService(logger.Object, dataSource);
-
-            dataSource.Initialise(@".\TestData\example_data.json");
+            var sut = new PersonQueryService(logger.Object, dataSource.Object);
 
             // Act
-            var getFullNamesByIdResults = sut.GetFullNamesById(53);
-            var getCommaSeparatedFirstNamesByAgeResults = sut.GetCommaSeparatedFirstNamesByAge(23);
-            var getGenderDistributionByAgeResults = sut.GetGenderDistributionByAge();
+            var getFullNamesByIdResults = await sut.GetFullNamesById(53);
+            var getCommaSeparatedFirstNamesByAgeResults = await sut.GetCommaSeparatedFirstNamesByAge(23);
+            var getGenderDistributionByAgeResults = await sut.GetGenderDistributionByAge();
 
             // Assert
             getFullNamesByIdResults.Should().Contain(x => x == "Bill Bryson");
@@ -40,7 +41,6 @@ namespace SevenWest.Tests
                 "Age: 23 M: 1 T: 1 Y: 0 F: 0",
                 "Age: 54 M: 1 T: 0 Y: 0 F: 0",
                 "Age: 66 M: 0 T: 0 Y: 2 F: 1"
-
             );
 
         }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Extensions.Logging.File;
+using System.Net.Http;
 using SevenWest.Console.Services;
 using SevenWest.Core.Services;
 
@@ -31,9 +31,11 @@ namespace SevenWest.Console
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<IConfiguration>(configuration);
-                    services.AddScoped(typeof(IDataSource<>), typeof(JsonDataSource<>));
+                    services.AddScoped(typeof(IPersonDataSource), typeof(ApiPersonDataSource));
                     services.AddScoped<IPersonQueryService, PersonQueryService>();
                     services.AddScoped<IOutputService, ConsoleOutputService>();
+                    services.AddMemoryCache();
+                    services.AddHttpClient();
                 })
                 .Build();
         }

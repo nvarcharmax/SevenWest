@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SevenWest.Core.Services
 {
     public interface IPersonQueryService
     {
-        List<string> GetFullNamesById(int id);
-        List<string> GetCommaSeparatedFirstNamesByAge(int age);
-        List<string> GetGenderDistributionByAge();
+        Task<List<string>> GetFullNamesById(int id);
+        Task<List<string>> GetCommaSeparatedFirstNamesByAge(int age);
+        Task<List<string>> GetGenderDistributionByAge();
     }
 }

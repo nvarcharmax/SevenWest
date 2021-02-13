@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SevenWest.Core.Entities;
 
@@ -8,32 +9,35 @@ namespace SevenWest.Core.Services
     public class PersonQueryService : IPersonQueryService
     {
         public ILogger<PersonQueryService> _logger;
-        public IDataSource<Person> _dataSource;
+        public IPersonDataSource _dataSource;
 
-        public PersonQueryService(ILogger<PersonQueryService> logger, IDataSource<Person> dataSource)
+        public PersonQueryService(ILogger<PersonQueryService> logger, IPersonDataSource dataSource)
         {
             _logger = logger;
             _dataSource = dataSource;
         }
 
-        public List<string> GetFullNamesById(int id)
+        public async Task<List<string>> GetFullNamesById(int id)
         {
-            return _dataSource.Data.Where(x => x.Id == id).Select(x => x.FullName).ToList();
+            var data = await _dataSource.Get();
+            return data.Where(x => x.Id == id).Select(x => x.FullName).ToList();
         }
 
-        public List<string> GetCommaSeparatedFirstNamesByAge(int age)
+        public async Task<List<string>> GetCommaSeparatedFirstNamesByAge(int age)
         {
+            var data = await _dataSource.Get();
             return new List<string>()
             {
                 string.Join(",",
-                    _dataSource.Data.Where(x => x.Age == age).Select(x => x.First)
+                    data.Where(x => x.Age == age).Select(x => x.First)
                 )
             };
         }
-        public List<string> GetGenderDistributionByAge()
+        public async Task<List<string>> GetGenderDistributionByAge()
         {
-            var groups = _dataSource.Data.GroupBy(x => x.Age).OrderBy(x => x.Key);
-            var distinctGenders = _dataSource.Data.Select(x => x.Gender).Distinct().ToArray();
+            var data = await _dataSource.Get();
+            var groups = data.GroupBy(x => x.Age).OrderBy(x => x.Key);
+            var distinctGenders = data.Select(x => x.Gender).Distinct().ToArray();
 
             var results = new List<string>();
 
