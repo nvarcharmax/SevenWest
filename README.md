@@ -1,33 +1,35 @@
+
 # SevenWest
 
 ## Design Principles
 
 - Simplicity and readability
-My view of modern software development philosophies revolves around simplicity, readability and ability to make and ship changes quickly. 
-As such, the key principle to support this, is building lean services that caters for the business needs; whilst still catering for modern non functional requirements such observability, judicious caching and performance optimization. 
-Upfront design is still of high value especially with some technical decisions that are hard to reverse (eg change in API contracts affecting different teams, choice of data storage), however, most day to day tactical decisions in software (such as layers of abstractions within a codebase managed by one team) are to be executed in shorter time frames and lead time to deployment equally short in light of modern DevOps practices and tooling.
+
+My view of modern software development philosophies revolves around simplicity, readability and ability to make and ship changes quickly. This is aided by modern Devops tooling and practices as well as the fact that most tactical decisions are easily reversible.
 
 - Testability
+
 Key parts of the solution is made testable wherever suitable, especially with the queries and abstractions of remote Http calls
 
 ## Project structure
 
 There are 2 main projects:
-SevenWest.Console
-SevenWest.Core
 
-### Assumptions
+- SevenWest.Console
+- SevenWest.Core
+
+## Assumptions
 
 - The data provided in example_data.json contradicts with "File formatted with JSON on every row". 
 I'm assuming here that the json file contains an array of json objects
 
 - There are genders other than M or F. 
-Without making further assumptions, I will respect the new genders provided in the file and process them accordingly. 
-If I were to sanitize those genders, then I would create a mapping from the new ones to the "traditional" M or F
+Without making any further incorrect assumptions, I will accept the new genders provided in the file and process them accordingly. 
+If I were to "validate" those genders, then I would either create mapping to the "traditional" M or F or exclude the data for consumption
 
 - In the sample data, there are missing quotes around the property "gender", this will be handled by the Newtonsoft Json library
 
-### Considerations
+## Considerations
 
 1. The data source may change.
 For this requirement, the IPersonDataSource is abstracted and can be replaced by a different implementation.
@@ -54,4 +56,5 @@ The output of the queries are returned in IOutputService such that a future Web 
 ## Notes
 
 - I previously attempted a version of this test 2 years ago. However a remote Api call was not involved then
+
 - The Unit Tests have been extended to support fake Http responses back to support multiple Http operations
